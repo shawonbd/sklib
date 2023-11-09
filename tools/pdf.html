@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PDF PLAYER</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+
+<style id="webmakerstyle">
+body {
+  width: 100%;
+  height: 100vh;
+  overflow-x: hidden;
+  margin: 0;
+}
+
+#adobe-dc-view {
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+}
+
+</style>
+</head>
+<body>
+<div id="embeddedView"></div>
+
+<script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+
+
+
+ <script>
+function getParam ( sname )
+{
+  var params = location.search.substr(location.search.indexOf("?")+1);
+  var sval =  params.replace("sv=", "");
+  
+  return sval;
+}
+var sv = getParam("sv");
+</script>
+<script>
+  var responseText = ''+sv+'';
+  urlArry = responseText.split(',');
+  start = true;
+  num_of_urlArry = urlArry.length;
+  index_of_urlArry = 0;
+</script>
+
+  
+<script>
+
+const urlToPDF =
+  ""+sv+"";
+const fileID = "3A5E36C8AA950DCDEBFBFE46FFCDE0A6"; // The fileID binds the annotations to the document
+const clientID = "e800d12fc12c4d60960778b2bc4370af";
+
+const viewerOptions = {
+  embedMode: "FULL_WINDOW",
+  defaultViewMode: "FIT_PAGE",
+  showDownloadPDF: true,
+  showPrintPDF: true,
+  showLeftHandPanel: false,
+  showAnnotationTools: true,
+  enableAnnotationAPIs: true
+};
+
+const annotationManagerConfig = {
+  showToolbar: true,
+  showCommentsPanel: true,
+  downloadWithAnnotations: true,
+  printWithAnnotations: true
+};
+
+function previewPDF(view, pdfURL) {
+  fetch(pdfURL)
+    .then((res) => res.blob())
+    .then((blob) => {
+      var previewPromise = view.previewFile(
+        {
+          // The file content
+          content: { promise: Promise.resolve(blob.arrayBuffer()) },
+          metaData: {
+            fileName: pdfURL.split("/").slice(-1)[0],
+            id: fileID
+          }
+        },
+        viewerOptions
+      );
+      createAnnotationManager(previewPromise);
+    });
+}
+
+function createAnnotationManager(previewPromise) {
+  previewPromise.then((view) => {
+    view.getAnnotationManager().then((annotationManager) => {
+      annotationManager.setConfig(annotationManagerConfig);
+      addAnnotations(annotationManager);
+    });
+  });
+}
+
+/*
+        In practice you would replace this function with code that would retrieve the annotations for the document.
+        */
+function addAnnotations(annotationManager) {
+  var annotationURLs = [
+    "https://assets.codepen.io/4479906/underline.json",
+    "https://assets.codepen.io/4479906/highlight.json",
+    "https://assets.codepen.io/4479906/scribble.json"
+  ];
+  for (i = 0; i < annotationURLs.length; i++) {
+    var annotURL = annotationURLs[i];
+    fetch(annotURL)
+      .then((response) => response.json())
+      .then((json) => {
+        annotationManager.addAnnotations([json]);
+      });
+  }
+}
+
+document.addEventListener("adobe_dc_view_sdk.ready", function () {
+  var embeddedView = new AdobeDC.View({
+    clientId: clientID,
+    divId: "embeddedView"
+  });
+  previewPDF(embeddedView, urlToPDF, fileID);
+});
+
+// Add arrayBuffer if necessary i.e. Safari
+(function () {
+  if (Blob.arrayBuffer != "function") {
+    Blob.prototype.arrayBuffer = myArrayBuffer;
+  }
+
+  function myArrayBuffer() {
+    return new Promise((resolve) => {
+      let fileReader = new FileReader();
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.readAsArrayBuffer(this);
+    });
+  }
+})();
+</script>
+</body>
+</html>
