@@ -1,11 +1,25 @@
-<div id="adobe-dc-view"></div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>pdf</title>
+  
+</head>
+<body>
+   <div id="adobe-dc-view"></div>
 <script src="https://acrobatservices.adobe.com/view-sdk/viewer.js"></script>
 <script type="text/javascript">
 	document.addEventListener("adobe_dc_view_sdk.ready", function(){ 
-		var adobeDCView = new AdobeDC.View({clientId: "4df561e8a5c84a578cb194e9c6c5cb17", divId: "adobe-dc-view"});
+		var adobeDCView = new AdobeDC.View({clientId: "a6d0dcf84f63456d8a2eef0e4c9b8ffe", divId: "adobe-dc-view"});
 		adobeDCView.previewFile({
 			content:{location: {url: "https://acrobatservices.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf"}},
 			metaData:{fileName: "Bodea Brochure.pdf"}
 		}, {showAnnotationTools: false});
 	});
 </script>
+
+   
+</body>
+</html>
+
